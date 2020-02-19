@@ -1,4 +1,4 @@
-module Examples.Sabotage where
+module Examples.Sabotage.Solution where
 
 import Algebra.Semiring
 import Control.Arrow
@@ -12,7 +12,6 @@ isThereAnEdge :: (Int,Int) -> (Int,Int) -> [(Int,Int)] -> ShortestPath (Int,Int)
 isThereAnEdge from to mines
   | from `elem` mines = NoPath
   | to `elem` mines   = NoPath
-  | from == to        = NoPath 
   | otherwise = if ((toY == fromY + 1) || (toY == fromY - 1)) && (toX == fromX)  -- Left or Right move
                 then Path 1 [(from,to)]
                 else if (toX == fromX + 1) && (toY == fromY) -- Down move 
@@ -30,16 +29,6 @@ adjacencyMatrix lengthX lengthY mines = Matrix $ chunksOf (lengthX * lengthY) ad
     allCoords = [(x,y) | x <- [1 .. lengthX], y <- [1 .. lengthY]]
 
 
-result2file :: ShortestPath (Int,Int) -> (Int,Int) -> IO ()
-result2file result start = writeFile "src/Examples/Outputs/Sabotage/sabotage.out" (result2string result start)
-
-result2string :: ShortestPath (Int,Int) -> (Int,Int) -> String
-result2string NoPath _ = "0"
-result2string (Path n steps) start = unlines $ [ show (n+1)
-                                               , show (fst start) <> " " <> show (snd start) ]
-                                               <> map (\(_,to) -> show (fst to) <> " " <> show (snd to)) steps
-
-
 -- TODO: A bit ugly. Maybe use Brent Yorgey's scanner.
 interpretInput :: String -> (Int, Int, (Int,Int), (Int,Int), [(Int,Int)])
 interpretInput input = (lengthX, lengthY, start, finish, mines)
@@ -55,12 +44,26 @@ interpretInput input = (lengthX, lengthY, start, finish, mines)
     finish = (drop (3 + nMines) >>> head >>> words >>> map read >>> list2tuple) inputs
 
 
-solve :: IO ()
-solve = do 
-  input <- readFile "src/Examples/Inputs/Sabotage/sabotage.in"
+result2string :: ShortestPath (Int,Int) -> (Int,Int) -> String
+result2string NoPath _ = "0"
+result2string (Path n steps) start = unlines $ [ show (n+1)
+                                               , show (fst start) <> " " <> show (snd start) ]
+                                               <> map (\(_,to) -> show (fst to) <> " " <> show (snd to)) steps
+
+
+solveOne :: FilePath -> IO ()
+solveOne fp= do 
+  input <- readFile ("src/Examples/Sabotage/In/sabotage" <> fp <> ".in")
   let (lengthX, lengthY, start, finish, mines) = interpretInput input
   
   let cl = closure $ adjacencyMatrix lengthX lengthY mines
       result = cl ! (tuple2index start lengthY, tuple2index finish lengthY)
   
-  result2file result start
+  writeFile ("src/Examples/Sabotage/Out/sabotage" <> fp <> ".out") (result2string result start)
+
+
+solve :: IO ()
+solve = do 
+  let filePaths = map show [1 .. 2]
+  mapM_ solveOne filePaths 
+  

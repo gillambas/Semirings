@@ -1,4 +1,4 @@
-module Examples.KnightsOfNi where
+module Examples.KnightsOfNi.Solution where
 
 import Algebra.Semiring
 import Control.Arrow
@@ -67,7 +67,7 @@ distsShrubberiesToKnights (InterpretedInput _ c _ k ss _) cl = map (\s -> cl ! (
 
 solveOne :: FilePath -> IO ()
 solveOne fp = do 
-  input <- readFile ("src/Examples/Inputs/KnightsOfNi/knights" <> fp <> ".in")
+  input <- readFile ("src/Examples/KnightsOfNi/In/knights" <> fp <> ".in")
   let interpretedInput = interpretInput input
   
   let closureStartToShrubberies = closure $ startToShrubberiesAdj interpretedInput
@@ -81,11 +81,12 @@ solveOne fp = do
 
   print d
 
-  writeFile ("src/Examples/Outputs/KnightsOfNi/knights" <> fp <> ".out") (show d)
+  writeFile ("src/Examples/KnightsOfNi/Out/knights" <> fp <> ".out") (show d)
 
 
 solve :: IO ()
 solve = do 
-  let filePaths = map show [1 .. 10]
+  -- Runs out of memory for test cases 7 - 10
+  let filePaths = map show [1 .. 6]
   mapM_ solveOne filePaths 
   
