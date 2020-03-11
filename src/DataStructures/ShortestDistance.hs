@@ -3,11 +3,17 @@ module DataStructures.ShortestDistance where
 import Algebra.Semiring
 
 
-data ShortestDistance = Distance Int | Unreachable deriving Show
+data ShortestDistance = Distance Double | Unreachable deriving Show
+
+
+fromDistance :: ShortestDistance -> Double 
+fromDistance (Distance d) = d
+fromDistance Unreachable  = error "fromDistance: Expected (Distance d) and got Unreachable."
+
 
 instance Semiring ShortestDistance where 
   zero = Unreachable 
-  one = Distance 0 
+  one = Distance 0.0
   
   x <+> Unreachable = x
   Unreachable <+> x = x 

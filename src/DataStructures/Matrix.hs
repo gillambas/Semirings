@@ -8,7 +8,7 @@ data Matrix a = Scalar a
               | Matrix [[a]] 
 
 instance Show a => Show (Matrix a) where
-  show (Scalar x) = "Square matrix with diagonal element " <> (show x)
+  show (Scalar x) = "Square matrix with diagonal element " <> show x
   show (Matrix rows) = unlines $ map (unwords . map show) rows
 
 
@@ -70,7 +70,7 @@ instance StarSemiring a => StarSemiring (Matrix a) where
 
 
 getElem :: Semiring a => Int -> Int -> Matrix a -> a 
-getElem row col (Scalar s) = if (row==col) then s else zero 
+getElem row col (Scalar s) = if row == col then s else zero 
 getElem row col (Matrix m) = (m !! row) !! col 
 
 
@@ -78,7 +78,7 @@ getElem row col (Matrix m) = (m !! row) !! col
 (!) m (row,col) = getElem row col m
 
 pos :: Eq a => a -> Matrix a -> [(Int,Int)]
-pos x (Matrix m) = concat $ map allOccurancesInRow indexedMatrix 
+pos x (Matrix m) = concatMap allOccurancesInRow indexedMatrix 
   where 
     -- Now each row of the matrix is numbered 
     --indexedMatrix :: [([a],Int)]
