@@ -1,8 +1,10 @@
+{-# LANGUAGE TupleSections #-}
+
 module DataStructures.Matrix where
 
 import           Algebra.Semiring
 import qualified Data.List        as L
-
+import Data.List.Index
 
 data Matrix a = Scalar a
               | Matrix [[a]] 
@@ -53,8 +55,8 @@ instance Semiring a => Semiring (Matrix a) where
   Scalar a <.> Scalar b = Scalar (a <.> b) 
   Scalar a <.> Matrix b = Matrix (map (map (a <.>)) b) 
   Matrix a <.> Scalar b = Matrix (map (map (<.> b)) a) 
-  Matrix a <.> Matrix b = let cols = L.transpose b in
-                          Matrix [[foldl1 (<+>) (zipWith (<.>) row col) | col <- cols] | row <- a]
+  Matrix a <.> Matrix b = let cols = L.transpose b 
+                          in Matrix [[foldl1 (<+>) (zipWith (<.>) row col) | col <- cols] | row <- a]
 
 
 instance StarSemiring a => StarSemiring (Matrix a) where 
@@ -73,21 +75,13 @@ getElem :: Semiring a => Int -> Int -> Matrix a -> a
 getElem row col (Scalar s) = if row == col then s else zero 
 getElem row col (Matrix m) = (m !! row) !! col 
 
-
 (!) :: Semiring a => Matrix a -> (Int,Int) -> a 
 (!) m (row,col) = getElem row col m
 
+
 pos :: Eq a => a -> Matrix a -> [(Int,Int)]
-pos x (Matrix m) = concatMap allOccurancesInRow indexedMatrix 
-  where 
-    -- Now each row of the matrix is numbered 
-    --indexedMatrix :: [([a],Int)]
-    indexedMatrix = zip m [1 .. (length m)]
-
-    --allOccurancesInRow :: Eq a => ([a],Int) -> [(Int,Int)]
-    allOccurancesInRow (row,rowIdx) = let colIdxs = map (+1) (L.elemIndices x row)
-                                      in zip (replicate (length colIdxs) rowIdx) colIdxs
-
-
+pos x (Matrix m) = let allOccurancesInRow rowIdx = map (rowIdx,) . L.elemIndices x
+                   in  iconcatMap allOccurancesInRow m
+    
 (?) :: Eq a => Matrix a -> a -> [(Int,Int)]
 (?) = flip pos

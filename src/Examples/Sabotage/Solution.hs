@@ -8,7 +8,7 @@ import DataStructures.ShortestPath
 import Parsing
 
 
-isThereAnEdge :: (Int,Int) -> (Int,Int) -> [(Int,Int)] -> ShortestPath (Int,Int)
+isThereAnEdge :: (Int,Int) -> (Int,Int) -> [(Int,Int)] -> ShortestPath Int (Int,Int)
 isThereAnEdge from to mines
   | from `elem` mines = NoPath
   | to `elem` mines   = NoPath
@@ -22,7 +22,7 @@ isThereAnEdge from to mines
     (toX,toY) = to 
 
 
-adjacencyMatrix :: Int -> Int -> [(Int,Int)] -> Matrix (ShortestPath (Int,Int))
+adjacencyMatrix :: Int -> Int -> [(Int,Int)] -> Matrix (ShortestPath Int (Int,Int))
 adjacencyMatrix lengthX lengthY mines = Matrix $ chunksOf (lengthX * lengthY) adjacencyMatrix'
   where 
     adjacencyMatrix' = [ isThereAnEdge from to mines | from <- allCoords, to <- allCoords ]
@@ -44,7 +44,7 @@ interpretInput input = (lengthX, lengthY, start, finish, mines)
     finish = (drop (3 + nMines) >>> head >>> words >>> map read >>> list2tuple) inputs
 
 
-result2string :: ShortestPath (Int,Int) -> (Int,Int) -> String
+result2string :: ShortestPath Int (Int,Int) -> (Int,Int) -> String
 result2string NoPath _ = "0"
 result2string (Path n steps) start = unlines $ [ show (n+1)
                                                , show (fst start) <> " " <> show (snd start) ]

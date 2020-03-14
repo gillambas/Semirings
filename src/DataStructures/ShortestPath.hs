@@ -1,14 +1,15 @@
 module DataStructures.ShortestPath where 
 
+import Algebra.Numbers
 import Algebra.Semiring
 
 
-data ShortestPath n = Path Int [(n,n)] | NoPath deriving (Show)
+data ShortestPath d n = Path d [(n,n)] | NoPath deriving (Show)
 
 
-instance Ord n => Semiring (ShortestPath n) where
+instance (Semiring d, Ord d, Ord n) => Semiring (ShortestPath d n) where
   zero = NoPath
-  one  = Path 0 []
+  one  = Path zero []
 
   x <+> NoPath = x
   NoPath <+> x = x
@@ -19,9 +20,9 @@ instance Ord n => Semiring (ShortestPath n) where
   
   x <.> NoPath = NoPath
   NoPath <.> x = NoPath
-  Path a p <.> Path a' p' = Path (a + a') (p ++ p')
+  Path a p <.> Path a' p' = Path (a <+> a') (p ++ p')
 
 
-instance Ord n => StarSemiring (ShortestPath n) where 
+instance (Semiring d, Ord d, Ord n) => StarSemiring (ShortestPath d n) where 
   closure _ = one 
 

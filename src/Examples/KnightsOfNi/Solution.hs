@@ -1,5 +1,6 @@
 module Examples.KnightsOfNi.Solution where
 
+import Algebra.Numbers
 import Algebra.Semiring
 import Control.Arrow
 import DataStructures.Matrix
@@ -35,7 +36,7 @@ interpretInput input = interpretedInput
                         , impassables = rawMap ? 1 }
 
 
-isAdjacent :: [(Int,Int)] -> (Int,Int) -> (Int,Int) -> ShortestDistance 
+isAdjacent :: [(Int,Int)] -> (Int,Int) -> (Int,Int) -> ShortestDistance Int
 isAdjacent prohibited (fromX,fromY) (toX,toY)
   | (fromX,fromY) `elem` prohibited = Unreachable 
   | (toX,toY) `elem` prohibited = Unreachable
@@ -44,24 +45,24 @@ isAdjacent prohibited (fromX,fromY) (toX,toY)
   | otherwise = Unreachable 
 
 
-createAdjacencyMatrix :: ((Int,Int) -> (Int,Int) -> ShortestDistance) -> Int -> Int -> Matrix ShortestDistance 
+createAdjacencyMatrix :: ((Int,Int) -> (Int,Int) -> ShortestDistance Int) -> Int -> Int -> Matrix (ShortestDistance Int)
 createAdjacencyMatrix creator nRows nCols = Matrix $ chunksOf (nRows * nCols) adjacencyMatrix'
   where 
     adjacencyMatrix' = [ creator from to | from <- allCoords, to <- allCoords ]
     allCoords = [(x,y) | x <- [1 .. nRows], y <- [1 .. nCols]]
 
 
-startToShrubberiesAdj :: InterpretedInput -> Matrix ShortestDistance
+startToShrubberiesAdj :: InterpretedInput -> Matrix (ShortestDistance Int)
 startToShrubberiesAdj (InterpretedInput r c _ k _ i) = createAdjacencyMatrix (isAdjacent ([k] <> i)) r c
 
-shrubberiesToKnightsAdj :: InterpretedInput -> Matrix ShortestDistance
+shrubberiesToKnightsAdj :: InterpretedInput -> Matrix (ShortestDistance Int)
 shrubberiesToKnightsAdj (InterpretedInput r c _ _ _ i) = createAdjacencyMatrix (isAdjacent i) r c
 
 
-distsStartToShrubbery :: InterpretedInput -> Matrix ShortestDistance -> [ShortestDistance]
+distsStartToShrubbery :: InterpretedInput -> Matrix (ShortestDistance Int) -> [ShortestDistance Int]
 distsStartToShrubbery (InterpretedInput _ c st _ ss _) cl = map (\s -> cl ! (tuple2index st c,tuple2index s c)) ss
 
-distsShrubberiesToKnights :: InterpretedInput -> Matrix ShortestDistance -> [ShortestDistance]
+distsShrubberiesToKnights :: InterpretedInput -> Matrix (ShortestDistance Int) -> [ShortestDistance Int]
 distsShrubberiesToKnights (InterpretedInput _ c _ k ss _) cl = map (\s -> cl ! (tuple2index s c,tuple2index k c)) ss
 
 
