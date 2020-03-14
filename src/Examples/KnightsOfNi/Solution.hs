@@ -49,7 +49,7 @@ createAdjacencyMatrix :: ((Int,Int) -> (Int,Int) -> ShortestDistance Int) -> Int
 createAdjacencyMatrix creator nRows nCols = Matrix $ chunksOf (nRows * nCols) adjacencyMatrix'
   where 
     adjacencyMatrix' = [ creator from to | from <- allCoords, to <- allCoords ]
-    allCoords = [(x,y) | x <- [1 .. nRows], y <- [1 .. nCols]]
+    allCoords = [(x,y) | x <- [0 .. (nRows-1)], y <- [0 .. (nCols-1)]]
 
 
 startToShrubberiesAdj :: InterpretedInput -> Matrix (ShortestDistance Int)

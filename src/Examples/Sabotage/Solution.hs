@@ -26,7 +26,7 @@ adjacencyMatrix :: Int -> Int -> [(Int,Int)] -> Matrix (ShortestPath Int (Int,In
 adjacencyMatrix lengthX lengthY mines = Matrix $ chunksOf (lengthX * lengthY) adjacencyMatrix'
   where 
     adjacencyMatrix' = [ isThereAnEdge from to mines | from <- allCoords, to <- allCoords ]
-    allCoords = [(x,y) | x <- [1 .. lengthX], y <- [1 .. lengthY]]
+    allCoords = [(x,y) | x <- [0 .. (lengthX - 1)], y <- [0 .. (lengthY - 1)]]
 
 
 -- TODO: A bit ugly. Maybe use Brent Yorgey's scanner.
@@ -38,21 +38,21 @@ interpretInput input = (lengthX, lengthY, start, finish, mines)
     (lengthX, lengthY) = (head >>> words >>> map read >>> list2tuple) inputs
     
     nMines = (drop 1 >>> head >>> read) inputs
-    mines = (drop 2 >>> take nMines >>> map words >>> map (map read) >>> map list2tuple) inputs 
+    mines = (drop 2 >>> take nMines >>> map words >>> map (map ((\x -> x - 1) . read)) >>> map list2tuple) inputs 
     
-    start = (drop (2 + nMines) >>> head >>> words >>> map read >>> list2tuple) inputs
-    finish = (drop (3 + nMines) >>> head >>> words >>> map read >>> list2tuple) inputs
+    start = (drop (2 + nMines) >>> head >>> words >>> map ((\x -> x - 1) . read) >>> list2tuple) inputs
+    finish = (drop (3 + nMines) >>> head >>> words >>> map ((\x -> x - 1) . read) >>> list2tuple) inputs
 
 
 result2string :: ShortestPath Int (Int,Int) -> (Int,Int) -> String
 result2string NoPath _ = "0"
 result2string (Path n steps) start = unlines $ [ show (n+1)
-                                               , show (fst start) <> " " <> show (snd start) ]
-                                               <> map (\(_,to) -> show (fst to) <> " " <> show (snd to)) steps
+                                               , show (fst start + 1) <> " " <> show (snd start + 1) ]
+                                               <> map (\(_,to) -> show (fst to + 1) <> " " <> show (snd to + 1)) steps
 
 
 solveOne :: FilePath -> IO ()
-solveOne fp= do 
+solveOne fp = do 
   input <- readFile ("src/Examples/Sabotage/In/sabotage" <> fp <> ".in")
   let (lengthX, lengthY, start, finish, mines) = interpretInput input
   
